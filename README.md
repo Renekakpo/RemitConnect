@@ -14,7 +14,7 @@ Architecture
 * MVVM (Model-View-ViewModel): Used for clear separation of concerns, making the codebase more manageable and testable.
 * Jetpack Compose: Employed for modern UI development, ensuring a responsive and visually appealing interface.
 * Retrofit: Utilized for network operations to fetch real-time currency conversion rates and handle API interactions.
-* LiveData: Used for observing data changes and updating the UI accordingly.
+* Flow: Used for observing data changes and updating the UI accordingly.
 
 
 Core Features
