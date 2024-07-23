@@ -117,7 +117,7 @@ class MainViewModel @Inject constructor(
     }
 
     // Updates the current balance
-    fun updateBalance(newBalance: Double) {
+    private fun updateBalance(newBalance: Double) {
         viewModelScope.launch { _currentBalance.value = newBalance }
     }
 
@@ -133,11 +133,12 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    // Calculate the remaining balance based on the total spent sum
     fun calculateRemainingBalance() {
         viewModelScope.launch {
             try {
                 val totalSpentSum = transactionDao.getTotalSpentSum() ?: 0.0
-                _currentBalance.value = 5000.0 - totalSpentSum
+                updateBalance(5000.0 - totalSpentSum)
             } catch (e: Exception) {
                 _currentBalance.value = 5000.0
             }
