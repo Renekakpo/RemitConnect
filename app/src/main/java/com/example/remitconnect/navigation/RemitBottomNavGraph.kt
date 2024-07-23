@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
@@ -56,17 +57,16 @@ fun RemitBottomNavGraph(navController: NavHostController, mainViewModel: MainVie
         BottomNavScreen.Tontines,
         BottomNavScreen.Settings
     )
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val currentRoute = remember { mutableStateOf(BottomNavScreen.Home.route) }
 
     Scaffold(
         bottomBar = {
             BottomNavigation(
-                modifier = Modifier.height(80.dp),
+                modifier = Modifier.height(screenHeight * 0.1f),
                 contentColor = MaterialTheme.colorScheme.background,
                 backgroundColor = MaterialTheme.colorScheme.background
             ) {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
                 items.forEach { screen ->
                     val selected = currentRoute.value == screen.route
 
@@ -134,7 +134,7 @@ fun RemitBottomNavGraph(navController: NavHostController, mainViewModel: MainVie
         // Content of the selected item
         when (currentRoute.value) {
             BottomNavScreen.Home.route -> {
-                HomeScreen(navController, mainViewModel = mainViewModel)
+                HomeScreen(modifier = modifier, navController = navController, mainViewModel = mainViewModel)
             }
 
             BottomNavScreen.Cards.route -> {
@@ -149,15 +149,5 @@ fun RemitBottomNavGraph(navController: NavHostController, mainViewModel: MainVie
                 SettingsScreen(navController)
             }
         }
-        /*NavHost(
-            navController,
-            startDestination = BottomNavScreen.Home.route,
-            Modifier.padding(innerPadding)
-        ) {
-            composable(BottomNavScreen.Home.route) { HomeScreen(navController) }
-            composable(BottomNavScreen.Cards.route) { CardsScreen(navController) }
-            composable(BottomNavScreen.Tontines.route) { TontinesScreen(navController) }
-            composable(BottomNavScreen.Settings.route) { SettingsScreen(navController) }
-        }*/
     }
 }

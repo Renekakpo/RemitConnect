@@ -84,13 +84,16 @@ import com.example.remitconnect.utils.Utils.getCountryByPhonePrefix
 import com.example.remitconnect.utils.Utils.getCurrencyCode
 import com.example.remitconnect.utils.Utils.getDefaultCountry
 import com.example.remitconnect.viewModel.MainViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionStatus
+import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.launch
 
 object RecipientListScreen : RemitNavDestination {
     override val route: String = "recipient_list_screen"
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun RecipientListScreen(
     navController: NavHostController,
@@ -116,6 +119,7 @@ fun RecipientListScreen(
             selectedCountry = it
         }
     }
+    val contactsPermissionState = rememberPermissionState(android.Manifest.permission.READ_CONTACTS)
 
     val processState by mainViewModel.processState.collectAsState()
     val currentTransaction by mainViewModel.currentTransaction.collectAsState()
@@ -131,7 +135,13 @@ fun RecipientListScreen(
     }
 
     LaunchedEffect(Unit) {
-        mainViewModel.fetchRecipients()
+        if (previousRecipients.isEmpty()) {
+            mainViewModel.fetchRecipients()
+        }
+
+        if (contactsPermissionState.status != PermissionStatus.Granted) {
+            contactsPermissionState.launchPermissionRequest()
+        }
     }
 
     Column(
@@ -161,7 +171,11 @@ fun RecipientListScreen(
                     showBottomSheet = true
                 },
                 onChooseContactClicked = {
-                    contactPickerLauncher.launch(Unit)
+                    if (contactsPermissionState.status == PermissionStatus.Granted) {
+                        contactPickerLauncher.launch(Unit)
+                    } else {
+                        contactsPermissionState.launchPermissionRequest()
+                    }
                 },
                 onFormSubmitted = {
                     if (selectedCountry == null) {
@@ -176,7 +190,9 @@ fun RecipientListScreen(
                                     country = "${selectedCountry?.name}"
                                 )
                                 val updatedTransaction = currentTransaction?.copy(
-                                    recipient = recipient
+                                    recipient = recipient.copy(
+                                        currencyCode = recipient.currencyCode ?: "XOF",
+                                    )
                                 )
                                 updatedTransaction?.let {
                                     mainViewModel.updateCurrentTransaction(
@@ -203,15 +219,16 @@ fun RecipientListScreen(
                     PreviewRecipientsSection(
                         previousRecipients = filteredPreviousRecipients,
                         onItemClick = { item ->
+                            val updatedTransaction = currentTransaction?.copy(
+                                recipient = item.copy(
+                                    currencyCode = getCurrencyCode(item.country) ?: "XOF"
+                                )
+                            )
+
                             scope
                                 .launch {
-                                    val updatedTransaction = currentTransaction?.copy(
-                                        recipient = item.copy(currencyCode =  getCurrencyCode(item.country))
-                                    )
-                                    updatedTransaction?.let {
-                                        mainViewModel.updateCurrentTransaction(
-                                            transaction = it
-                                        )
+                                    if (updatedTransaction != null) {
+                                        mainViewModel.updateCurrentTransaction(transaction = updatedTransaction)
                                     }
                                 }
                                 .invokeOnCompletion {

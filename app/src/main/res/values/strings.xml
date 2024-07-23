@@ -68,4 +68,11 @@
     <string name="total_received_text">Recipient gets</string>
     <string name="transaction_success_text">"Your money is on the way. Get excited! "</string>
     <string name="got_it_button_text">Got it!</string>
+    <string name="insufficient_balance_text">Insufficient balance</string>
+    <string name="no_transactions_yet_text">No transactions yet</string>
+    <string name="failed_to_fetch_last_5_local_transactions_text">Failed to fetch last 5 local transactions</string>
+    <string name="no_recipients_found_text">No recipients found.</string>
+    <string name="recipients_fetch_failed_text">Failed to fetch recipients.</string>
+    <string name="empty_mobile_wallets_text">No mobile wallets found.</string>
+    <string name="failed_to_fetch_mobile_wallets_text">Failed to fetch mobile wallets.</string>
 </resources>

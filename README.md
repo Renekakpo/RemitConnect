@@ -49,6 +49,19 @@ Build and Run:
 -------------------------------------------
 Select your desired emulator or connected device and run the app.
 
+Screenshots
+------------------------------------------
+<div style="display: flex; flex-wrap: wrap; justify-content: space-around; gap: 20px;">
+    <img src="./screenshot/screenshot_homescreen.png" alt="HomeScreen" width="225" height="450" />
+    <img src="./screenshot/screenshot_transfer_opt_screen.png" alt="TransferOptScreen" width="225" height="450" />
+    <img src="./screenshot/screenshot_transfer_dest_opt_screen.png" alt="TransferDestOptScreen" width="225" height="450" />
+    <img src="./screenshot/screenshot_recipients_screen.png" alt="RecipientsScreen" width="225" height="450" />
+    <img src="./screenshot/screenshot_mobile_wallet_opt_screen.png" alt="MobileWalletOptScreen" width="225" height="450" />
+    <img src="./screenshot/screenshot_transfer_summary_screen.png" alt="TransferSummaryScreen" width="225" height="450" />
+    <img src="./screenshot/screenshot_confirmation_screen.png" alt="ConfirmationScreen" width="225" height="450" />
+    <img src="./screenshot/screenshot_success_screen.png" alt="SuccessScreen" width="225" height="450" />
+</div>
+
 Contact
 -------------------------------------------
 For any questions or clarifications, feel free to reach out to me. I hope you find the app meets your expectations and look forward to your feedback.

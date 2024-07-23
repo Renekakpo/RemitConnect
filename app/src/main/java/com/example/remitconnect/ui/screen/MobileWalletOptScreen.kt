@@ -1,5 +1,6 @@
 package com.example.remitconnect.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -52,6 +53,7 @@ import com.example.remitconnect.ui.common.CustomLoader
 import com.example.remitconnect.ui.common.ErrorHandlerView
 import com.example.remitconnect.ui.theme.RemitConnectTheme
 import com.example.remitconnect.viewModel.MainViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 object MobileWalletOptScreen : RemitNavDestination {
@@ -70,10 +72,15 @@ fun MobileWalletOptScreen(
     val currentTransaction by mainViewModel.currentTransaction.collectAsState()
     val mobileWallets by mainViewModel.mobileWallets.collectAsState()
 
-    LaunchedEffect(mobileWallets) {
-        mainViewModel.fetchMobileWallets()
-        val walletName = currentTransaction?.recipient?.mobileWallet
-        selectMobileWallet = mobileWallets.find { it.name == walletName }
+    LaunchedEffect(Unit) {
+        if (mobileWallets.isEmpty()) {
+            mainViewModel.fetchMobileWallets()
+        }
+
+        if (mobileWallets.isNotEmpty() && selectMobileWallet == null) {
+            val walletName = currentTransaction?.recipient?.mobileWallet
+            selectMobileWallet = mobileWallets.find { it.name == walletName }
+        }
     }
 
     Column(

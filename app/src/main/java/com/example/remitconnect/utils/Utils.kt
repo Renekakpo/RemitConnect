@@ -142,7 +142,7 @@ object Utils {
     fun calculateTransaction(amountToSend: Double, currentTransaction: Transaction): Transaction {
         val transferFeesPercentage = 0.05 // Example: 5% transaction fee
         val transferFees = amountToSend * transferFeesPercentage
-        val totalSpent = amountToSend + currentTransaction.monecoFees + transferFees
+        val totalSpent = if (amountToSend == 0.0) amountToSend else amountToSend + currentTransaction.monecoFees + transferFees
         val amountReceived = (amountToSend - transferFees) * currentTransaction.conversionRate
 
         return currentTransaction.copy(

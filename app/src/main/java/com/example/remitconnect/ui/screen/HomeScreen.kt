@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -22,6 +23,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -48,13 +52,16 @@ import com.example.remitconnect.ui.common.CustomLoader
 import com.example.remitconnect.ui.theme.RemitConnectTheme
 import com.example.remitconnect.utils.Utils.doubleToCurrency
 import com.example.remitconnect.viewModel.MainViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 object HomeScreen : RemitNavDestination {
     override val route: String = "home_screen"
 }
 
 @Composable
-fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel = hiltViewModel()) {
+fun HomeScreen(modifier: Modifier = Modifier, navController: NavHostController, mainViewModel: MainViewModel) {
     val localConfig = LocalConfiguration.current
     val screenWidth = localConfig.screenWidthDp
 
@@ -70,8 +77,8 @@ fun HomeScreen(navController: NavHostController, mainViewModel: MainViewModel = 
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = modifier
+            .wrapContentSize()
             .verticalScroll(rememberScrollState())
             .background(MaterialTheme.colorScheme.background)
             .padding(top = 16.dp, start = 16.dp, end = 16.dp)
@@ -364,6 +371,6 @@ fun TransactionItem(transaction: Transaction) {
 @Composable
 fun HomeScreenPreview() {
     RemitConnectTheme {
-        HomeScreen(navController = rememberNavController())
+        HomeScreen(navController = rememberNavController(), mainViewModel = hiltViewModel())
     }
 }

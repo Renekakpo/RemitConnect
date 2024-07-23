@@ -2,6 +2,8 @@ package com.example.remitconnect.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.remitconnect.R
+import com.example.remitconnect.RemitConnectApp.Companion.appContext
 import com.example.remitconnect.data.api.RemitApi
 import com.example.remitconnect.data.local.dao.TransactionDao
 import com.example.remitconnect.data.local.entities.Transaction
@@ -10,6 +12,7 @@ import com.example.remitconnect.data.model.Recipient
 import com.example.remitconnect.enums.ProcessState
 import com.example.remitconnect.utils.Utils.mapMobileWalletsToLogos
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -54,14 +57,14 @@ class MainViewModel @Inject constructor(
             _processState.value = try {
                 val last5Transactions = transactionDao.getLast5Transactions()
                 if (last5Transactions.isEmpty()) {
-                    ProcessState.Error(message = "No transactions yet")
+                    ProcessState.Error(message = appContext.getString(R.string.no_transactions_yet_text))
                 } else {
                     _localTransactions.value = last5Transactions
                     ProcessState.Done
                 }
             } catch (e: Exception) {
                 ProcessState.Error(
-                    message = e.localizedMessage ?: "Failed to fetch last 5 local transactions"
+                    message = e.localizedMessage ?: appContext.getString(R.string.failed_to_fetch_last_5_local_transactions_text)
                 )
             }
         }
@@ -74,13 +77,13 @@ class MainViewModel @Inject constructor(
             _processState.value = try {
                 val recipients = remitApi.getPreviousRecipients()
                 if (recipients.isEmpty()) {
-                    ProcessState.Error(message = "No recipients found.")
+                    ProcessState.Error(message = appContext.getString(R.string.no_recipients_found_text))
                 } else {
                     updatePreviousRecipients(recipients)
                     ProcessState.Done
                 }
             } catch (e: Exception) {
-                ProcessState.Error(message = e.localizedMessage ?: "Failed to fetch recipients.")
+                ProcessState.Error(message = e.localizedMessage ?: appContext.getString(R.string.recipients_fetch_failed_text))
             }
         }
     }
@@ -92,7 +95,7 @@ class MainViewModel @Inject constructor(
             _processState.value = try {
                 val mobileWallets = remitApi.getMobileWallets()
                 if (mobileWallets.isEmpty()) {
-                    ProcessState.Error(message = "No mobile wallets found.")
+                    ProcessState.Error(message = appContext.getString(R.string.empty_mobile_wallets_text))
                 } else {
                     val mappedWallets = mapMobileWalletsToLogos(mobileWallets)
                     updateMobileWallets(mappedWallets)
@@ -100,7 +103,7 @@ class MainViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 ProcessState.Error(
-                    message = e.localizedMessage ?: "Failed to fetch mobile wallets."
+                    message = e.localizedMessage ?: appContext.getString(R.string.failed_to_fetch_mobile_wallets_text)
                 )
             }
         }

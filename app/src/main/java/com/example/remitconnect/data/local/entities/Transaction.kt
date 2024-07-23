@@ -13,7 +13,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Transaction(
     @PrimaryKey(autoGenerate = true) // Automatically generates a unique ID for each transaction
-    val id: Int = -1, // Unique identifier for the transaction, default is -1 indicating a new entry
+    val id: Int = 0, // Unique identifier for the transaction, default is -1 indicating a new entry
     val option: String? = null, // Optional field for additional options related to the transaction
     val from: String? = null, // Optional field for specifying the source of the transaction
     @TypeConverters(RecipientConverter::class) // Specifies a custom type converter for the 'recipient' field

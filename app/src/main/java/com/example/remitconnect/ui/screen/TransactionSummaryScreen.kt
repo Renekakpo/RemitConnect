@@ -23,6 +23,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,7 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -50,6 +51,7 @@ import com.example.remitconnect.ui.common.CustomIcon
 import com.example.remitconnect.ui.common.DashedLine
 import com.example.remitconnect.ui.theme.RemitConnectTheme
 import com.example.remitconnect.utils.Utils.calculateTransaction
+import com.example.remitconnect.utils.Utils.displayToast
 import com.example.remitconnect.utils.Utils.doubleToCurrency
 import com.example.remitconnect.utils.Utils.formatAsPercentage
 import com.example.remitconnect.viewModel.MainViewModel
@@ -65,6 +67,7 @@ fun TransactionSummaryScreen(
     navController: NavHostController,
     mainViewModel: MainViewModel
 ) {
+    val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -129,7 +132,11 @@ fun TransactionSummaryScreen(
 
         CustomButton(
             onClick = {
-                showBottomSheet = true
+                if ((currentTransaction?.totalSpent ?: 0.0) < currentBalance) {
+                    showBottomSheet = true
+                } else {
+                    displayToast(message = context.getString(R.string.insufficient_balance_text))
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -141,7 +148,7 @@ fun TransactionSummaryScreen(
                 disabledContentColor = MaterialTheme.colorScheme.primary
             ),
             shape = MaterialTheme.shapes.small,
-            enabled = true,
+            enabled = (currentTransaction?.amount?.toDouble() ?: 0.0) > 0.0,
             text = stringResource(R.string.send_button_text),
             textColor = MaterialTheme.colorScheme.background
         )
@@ -228,7 +235,7 @@ fun ConfirmationBottomSheetContent(transaction: Transaction?, onConfirmClick: ()
             style = MaterialTheme.typography.bodySmall,
         )
         Text(
-            text = "${transaction?.recipient?.mobileWallet} ${transaction?.recipient?.phoneNumber ?: ""}",
+            text = "${if (!transaction?.recipient?.mobileWallet.isNullOrEmpty()) transaction?.recipient?.mobileWallet else transaction?.selectedWallet} ${transaction?.recipient?.phoneNumber ?: ""}",
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.SemiBold
         )
@@ -298,10 +305,13 @@ fun AmountToSendSection(
 
             TextField(
                 value = amountToSend,
-                onValueChange = {
-                    if (it.isNotEmpty() && it.toDouble() > 0.0 && it.toDouble() <= currentBalance) {
-                        amountToSend = it
-                        updateTransaction(it)
+                onValueChange = { input ->
+                    amountToSend = input
+
+                    if (amountToSend.isEmpty()) {
+                        updateTransaction("0")
+                    } else {
+                        updateTransaction(amountToSend)
                     }
                 },
                 placeholder = {
@@ -455,7 +465,7 @@ fun FeesBreakdownSection(transaction: Transaction?) {
             Spacer(modifier = Modifier.weight(1f))
 
             Text(
-                text = "${transaction?.conversionRate} ${transaction?.recipient?.currencyCode?.uppercase()}",
+                text = "${transaction?.conversionRate} ${transaction?.recipient?.currencyCode?.uppercase() ?: ""}",
                 color = MaterialTheme.colorScheme.onBackground,
                 style = MaterialTheme.typography.bodyMedium,
             )
@@ -507,7 +517,7 @@ fun FeesBreakdownSection(transaction: Transaction?) {
                         transaction?.amountReceived ?: 0.0,
                         "${transaction?.recipient?.currencyCode?.uppercase()}"
                     )
-                } ${transaction?.recipient?.currencyCode?.uppercase()}",
+                } ${transaction?.recipient?.currencyCode?.uppercase() ?: ""}",
                 color = MaterialTheme.colorScheme.onBackground,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.SemiBold
